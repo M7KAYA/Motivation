@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Motivation</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #3498db 0%, #6dd5fa 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        width: 420px;
+        background: #ffffff;
+        padding: 30px 25px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      #question-text {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: #333;
+        padding: 14px 20px;
+        background-color: #e3f2fd;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+        display: inline-block;
+        max-width: 100%;
+        line-height: 1.4;
+        user-select: none;
+      }
+      .btn-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 15px;
+      }
+      button {
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background-color: #3498db;
+        color: white;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+      }
+      button:hover {
+        background-color: #2980b9;
+        transform: scale(1.02);
+      }
+      button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+      }
+      .correct {
+        background-color: #2ecc71 !important;
+      }
+      .wrong {
+        background-color: #e74c3c !important;
+      }
+      .answer-btn:last-of-type {
+        margin-bottom: 10px;
+      }
+      #question-number {
+        margin-bottom: 15px;
+        font-size: 16px;
+        color: #666;
+        font-weight: 500;
+      }
+      #result-box {
+        margin-top: 20px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #2c3e50;
+        padding: 12px;
+        background-color: #dfefff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+      .hide {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 id="quiz-title">Motivation</h2>
+
+      <div id="start-box">
+        <button id="start-btn">Start</button>
+      </div>
+      <div id="quiz-box" class="hide">
+        <div id="question-number"></div>
+        <div id="question-text"></div>
+        <div id="answer-buttons" class="btn-grid"></div>
+        <button id="next-btn" disabled>Next</button>
+      </div>
+      <div id="result-box" class="hide">
+        <h3>Your Score</h3>
+        <p id="score-text"></p>
+        <button id="try-again-btn">Try Again</button>
+      </div>
+    </div>
+
+    <script>
+      const allQuestions = [
+        {
+          question: "What is the definition of motivation?",
+          options: [
+            "The ability to perform tasks without effort.",
+            "The force that drives people to take action.",
+            "A temporary feeling of happiness.",
+            "The process of avoiding challenges.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Which of the following is an example of intrinsic motivation?",
+          options: [
+            "Working overtime to earn a bonus.",
+            "Studying hard because you enjoy learning.",
+            "Completing a task to avoid punishment.",
+            "Following orders to please a supervisor.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Extrinsic motivation is driven by:",
+          options: [
+            "Internal desires and personal satisfaction.",
+            "External rewards or avoiding negative outcomes.",
+            "Unconscious impulses.",
+            "Genetic factors.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "The process of motivation begins with:",
+          options: [
+            "Tension.",
+            "Unsatisfied needs.",
+            "Search behavior.",
+            "Reduction of tension.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "What happens after an unsatisfied need is recognized?",
+          options: [
+            "The person feels satisfied.",
+            "Tension is reduced.",
+            "Tension arises.",
+            "The need disappears.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question:
+            "Which step initiates and starts the search for alternatives?",
+          options: [
+            "Unsatisfied needs.",
+            "Drive.",
+            "Search behavior.",
+            "Reduction of tension.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Who pioneered the Goal-Setting Theory of motivation?",
+          options: [
+            "Abraham Maslow.",
+            "Herzberg.",
+            "Edwin Locke and Gary Latham.",
+            "McClelland.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question:
+            "What is the starting point of the motivation process?",
+          options: [
+            "Tension.",
+            "Unsatisfied Need.",
+            "Search Behavior.",
+            "Reduction of Tension.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "At which stage of the motivation process does the evaluation of need satisfaction occur?",
+          options: [
+            "Unsatisfied Need.",
+            "Tension.",
+            "Tension Reduction.",
+            "Satisfied Need.",
+          ],
+          correctIndex: 3,
+        },
+        {
+          question: "Motivation is a continuous process because:",
+          options: [
+            "New needs arise after others are satisfied.",
+            "People always feel satisfied.",
+            "It is a one-time event.",
+            "It complex process.",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question: "Goal-directed behavior in motivation means:",
+          options: [
+            "Motivation may be positive or negative.",
+            "Behaving in a way that helps achieve personal or organizational goals.",
+            "The motivation is mental feeling and difficult to measure acurately.",
+            "The human wants and wishes are endless.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Positive motivation includes:",
+          options: [
+            "Punishment and threats.",
+            "Rewards and recognition.",
+            "Ignoring achievements.",
+            "Creating fear.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Motivation is considered a complex process because:",
+          options: [
+            "Motivation can be either positive or negative.",
+            "All employees respond the same way to motivators.",
+            "Human needs are mental feelings that are difficult to measure.",
+            "Human wants and wishs are endless.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Which of the following is NOT a benefit of motivation?",
+          options: [
+            "Higher performance.",
+            "Increased absenteeism.",
+            "Better employee relations.",
+            "Boosts morale.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Maslow’s Hierarchy of Needs starts with:",
+          options: [
+            "Self-actualization.",
+            "Physiological needs.",
+            "Esteem needs.",
+            "Social needs.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "According to Herzberg’s Two-Factor Theory, which of the following is a hygiene factor?",
+          options: [
+            "Achievement.",
+            "Recognition.",
+            "Salary.",
+            "Personal growth.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "McClelland’s Learned Needs Theory includes all EXCEPT:",
+          options: [
+            "Need for Achievement.",
+            "Need for Power.",
+            "Need for Affiliation.",
+            "Need for Security.",
+          ],
+          correctIndex: 3,
+        },
+        {
+          question: "The Goal-Setting Theory emphasizes:",
+          options: [
+            "Setting vague and easy goals.",
+            "Setting clear, specific, and challenging goals.",
+            "Avoiding deadlines.",
+            "Ignoring progress tracking.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Social learning theory suggests that behavior is influenced by:",
+          options: [
+            "Changes in life stages.",
+            "Observing others and the consequences they face.",
+            "Rewards and punishments.",
+            "Involuntary responses related to stimuli.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Behaviorism, as proposed by B.F. Skinner, focuses on:",
+          options: [
+            "Conditioning through rewards or punishments.",
+            "Internal thoughts and beliefs.",
+            "Genetic predispositions.",
+            "Learning behaviors through life stages changes.",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question: "Cognitive psychology emphasizes the role of:",
+          options: [
+            "Thoughts and beliefs in shaping behavior.",
+            "Environment interactions.",
+            "Life stages changes.",
+            "People are more motivated when they believe they can succeed at a particular task.",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question: "To overcome motivation challenges, one should:",
+          options: [
+            "Avoid setting goals.",
+            "Celebrate small wins.",
+            "Ignore progress.",
+            "Break goals into grater tasks.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Which of the following is a characteristic of motivation?",
+          options: [
+            "It is a one-time process.",
+            "It is only negative.",
+            "It is an internal feeling.",
+            "It ignores human needs.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "An example of negative motivation is:",
+          options: [
+            "Receiving a bonus.",
+            "Threat of demotion.",
+            "Get promotion.",
+            "Personal satisfaction.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "The highest level in Maslow’s Hierarchy of Needs is:",
+          options: [
+            "Physiological needs.",
+            "Esteem needs.",
+            "Self-actualization.",
+            "Social needs.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "The most important level in Maslow’s Hierarchy of Needs is:",
+          options: [
+            "Physiological needs.",
+            "Esteem needs.",
+            "Self-actualization.",
+            "Social needs.",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question: "Herzberg’s motivators include:",
+          options: [
+            "Salary and job security.",
+            "Achievement and recognition.",
+            "Working conditions.",
+            "Supervision.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "The Need for Power in McClelland’s theory refers to:",
+          options: [
+            "The desire to control others.",
+            "The desire to make friends.",
+            "The desire to avoid work.",
+            "The desire to achievements and recognition.",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "Which theory suggests that people are motivated by the belief in their ability to succeed?",
+          options: [
+            "Maslow’s Hierarchy of Needs.",
+            "Self-efficacy theory.",
+            "Herzberg’s Two-Factor Theory.",
+            "Classical conditioning.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Classical conditioning involves:",
+          options: [
+            "Shaping behavior through rewards or punishments.",
+            "Associating an involuntary response with a stimulus.",
+            "Setting challenging goals.",
+            "Observing others.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "The Need for Affiliation refers to:",
+          options: [
+            "The desire to control others.",
+            "The desire to achieve personal goals.",
+            "The desire to maintain good relationships.",
+            "The desire to avoid social interactions.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question:
+            "Which of the following is NOT part of the motivation process?",
+          options: [
+            "Unsatisfied needs.",
+            "Tension.",
+            "Immediate satisfaction.",
+            "Search behavior.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Which of the following is a way to maintain motivation?",
+          options: [
+            "Avoiding all challenges.",
+            'Connecting tasks to deeper values.',
+            "Take the goal as one unit.",
+            "Ignoring small achievements.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "The reduction of tension in the motivation process occurs when:",
+          options: [
+            "A need is satisfied.",
+            "A need is ignored.",
+            "Tension increases.",
+            "No action is taken.",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "Which of the following is an example of a physiological need?",
+          options: ["Recognition.", "Friendship.", "Food.", "Personal growth."],
+          correctIndex: 2,
+        },
+        {
+          question: 'What does the term "self-actualization" refer to?',
+          options: [
+            "Fulfilling basic survival needs.",
+            "Achieving personal growth and fulfillment.",
+            "Gaining social approval.",
+            "Needing for love and belonging.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "According to behaviorism, behavior is primarily shaped by:",
+          options: [
+            "Internal thoughts.",
+            "Conditioning",
+            "Genetic factors.",
+            "Spiritual beliefs.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Intrinsic motivation is driven by external rewards.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question: "The process of motivation starts with satisfied needs.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question: "Motivation is a one-time process.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Hygiene factors in Herzberg’s theory can motivate employees.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "McClelland’s theory includes the Need for Achievement, Power, and Affiliation.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question: "SMART goals are vague and easy.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question: "Social learning theory emphasizes observing others.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question: "Behaviorism focuses on internal thoughts and beliefs.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Cognitive psychology emphasizes the role of thoughts in behavior.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "Breaking goals into smaller tasks can help overcome motivation challenges.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "Extrinsic motivation is always more effective than intrinsic motivation.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question: "Esteem needs include self-respect and recognition.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question: "The environment has no role in shaping human behavior.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+      ];
+
+      let currentQuestionIndex = 0;
+      let score = 0;
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+      shuffleArray(allQuestions);
+
+      const startBtn = document.getElementById("start-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const tryAgainBtn = document.getElementById("try-again-btn");
+      const quizBox = document.getElementById("quiz-box");
+      const startBox = document.getElementById("start-box");
+      const questionNumberElement = document.getElementById("question-number");
+      const questionText = document.getElementById("question-text");
+      const answerButtons = document.getElementById("answer-buttons");
+      const resultBox = document.getElementById("result-box");
+      const scoreText = document.getElementById("score-text");
+
+      startBtn.addEventListener("click", startQuiz);
+      nextBtn.addEventListener("click", () => {
+        currentQuestionIndex++;
+        setNextQuestion();
+      });
+      tryAgainBtn.addEventListener("click", startQuiz);
+
+      function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        startBox.classList.add("hide");
+        resultBox.classList.add("hide");
+        quizBox.classList.remove("hide");
+        setNextQuestion();
+      }
+
+      function setNextQuestion() {
+        resetState();
+        if (currentQuestionIndex < allQuestions.length) {
+          showQuestion(allQuestions[currentQuestionIndex]);
+        } else {
+          showResult();
+        }
+      }
+
+      function showQuestion(questionObj) {
+        questionNumberElement.textContent = `Question ${
+          currentQuestionIndex + 1
+        } of ${allQuestions.length}`;
+        questionText.textContent = questionObj.question;
+
+        questionObj.options.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.textContent = option;
+          button.classList.add("answer-btn");
+          button.addEventListener("click", () =>
+            selectAnswer(button, index === questionObj.correctIndex)
+          );
+          answerButtons.appendChild(button);
+        });
+      }
+
+      function resetState() {
+        nextBtn.disabled = true;
+        answerButtons.innerHTML = "";
+      }
+
+      function selectAnswer(button, isCorrect) {
+        const buttons = answerButtons.querySelectorAll("button");
+        buttons.forEach((btn) => {
+          btn.disabled = true;
+        });
+
+        if (isCorrect) {
+          button.classList.add("correct");
+          score++;
+        } else {
+          button.classList.add("wrong");
+          const correctButton =
+            buttons[allQuestions[currentQuestionIndex].correctIndex];
+          correctButton.classList.add("correct");
+        }
+
+        nextBtn.disabled = false;
+      }
+
+      function showResult() {
+        quizBox.classList.add("hide");
+        resultBox.classList.remove("hide");
+        scoreText.textContent = `${score} out of ${allQuestions.length} correct`;
+      }
+    </script>
+  </body>
+</html>
